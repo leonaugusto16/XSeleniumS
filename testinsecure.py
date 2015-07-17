@@ -27,38 +27,37 @@ class Testinsecure(unittest.TestCase):
         self.verificationErrors = []
         self.accept_next_alert = True
 
-    def gerar():
-        ficheiro = open(HTML,"w")
-
-        i=0
-        ficheiro.write("<html>\n<head>\n<title>" + TITLE + "</title>\n</head>\n<body>\n<b><center>" + TITLE + "</b>\n</font>\n<br><br>\n")
-        for thumb in imgthumb:
-            i=i+1
-            print str(i) + " imagem inserida na pagina"
-            ficheiro.write(thumb)
-        ficheiro.write("\n</body>\n</html>")
-        ficheiro.close()
-
+    def treatmenturl(self,URL,count,countt):
+        if(countt==0 and len(URL['var'])>0):
+            return URL['url'] + URL['var'][0]+"="+ URL['bd'][count]
+        if(countt>0 and len(URL['var'])>0):
+            return URL['url'] + URL['var'][0]+"=test"+"&"+URL['var'][countt]+"="+URL['bd'][count]
+        else:
+            print "ERROR: Variable Not Set"
+            return 0
 
     def test_insecure(self):
         URL = json.loads(open('testinsecure.json').read())
 
-        count=0
-        while(count < len(URL['bd'])):
-            driver = self.driver
-            #vuln ="<script>alert(\"XSS\")</script>"
-            driver.get(URL['url'] + URL['var'][0] + URL['bd'][count])
-            try:
-                WebDriverWait(driver, 3).until(EC.alert_is_present(),
-                                       'Timed out waiting for PA creation ' +
-                                       'confirmation popup to appear.')
-                alert = driver.switch_to_alert()
-                alert.accept()
-                print "alert accepted - "+URL['bd'][count]
-            except TimeoutException:
-                print "no alert - "+URL['bd'][count]
-
-            count=count+1
+        countt=0
+        while(countt < len(URL['var'])):
+            count=0
+            print "\n######### Test Variable "+URL['var'][countt]
+            while(count < len(URL['bd'])):
+                driver = self.driver
+                driver.get(self.treatmenturl(URL,count,countt))
+                #driver.get(URL['url'] + URL['var'][countt]+"="+ URL['bd'][count])
+                try:
+                    WebDriverWait(driver, 1).until(EC.alert_is_present(),
+                                           'Timed out waiting for PA creation ' +
+                                           'confirmation popup to appear.')
+                    alert = driver.switch_to_alert()
+                    alert.accept()
+                    print "alert accepted - "+URL['bd'][count]
+                except TimeoutException:
+                    print "no alert - "+URL['bd'][count]
+                count=count+1
+            countt=countt+1
 
     def is_element_present(self, how, what):
         try: self.driver.find_element(by=how, value=what)
