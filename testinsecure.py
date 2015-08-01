@@ -33,8 +33,8 @@ class Testinsecure(unittest.TestCase):
         if(countt>0 and len(URL['var'])>0):
             return URL['url'] + URL['var'][0]+"=test"+"&"+URL['var'][countt]+"="+URL['bd'][count]
         else:
-            print "ERROR: Variable Not Set"
-            return 0
+           print "ERROR: Variable Not Set"
+           return 0
 
     def test_insecure(self):
         URL = json.loads(open('testinsecure.json').read())
